@@ -130,7 +130,7 @@ namespace screenTransitions {
     //% blockId=screen_transitions_start_transition
     //% block="start $transition screen transition for $time|ms reversed $reverse||and pause until done $pause"
     //% transition.shadow=screen_transitions_field_editor
-    //% time.shadow=timepicker
+    //% time.shadow=timePicker
     //% pause.defl=false
     //% weight=100
     export function startTransition(transition: Transition, time: number, reverse: boolean, pause = false) {
