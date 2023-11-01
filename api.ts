@@ -128,11 +128,12 @@ namespace screenTransitions {
     }
 
     //% blockId=screen_transitions_start_transition
-    //% block="start $transition screen transition for $time|ms reversed $reverse||and pause until done $pause"
+    //% block="start $transition transition for $time|ms reversed $reverse||and pause until done $pause"
     //% transition.shadow=screen_transitions_field_editor
     //% time.shadow=timePicker
     //% pause.defl=false
     //% weight=100
+    //% inlineInputMode=inline
     export function startTransition(transition: Transition, time: number, reverse: boolean, pause = false) {
         time = Math.max(time, 0);
         const speed = 100 / (time / 1000);
@@ -151,7 +152,7 @@ namespace screenTransitions {
     }
 
     //% blockId=screen_transitions_show_transition_at_percent
-    //% block="show $transition screen transition percent completed $percent reversed $reverse"
+    //% block="show $transition transition percent completed $percent reversed $reverse"
     //% transition.shadow=screen_transitions_field_editor
     //% percent.min=0;
     //% percent.max=100;
@@ -162,7 +163,7 @@ namespace screenTransitions {
     }
 
     //% blockId=screen_transitions_clear_screen_transition
-    //% block="clear current screen transition"
+    //% block="clear current transition"
     //% weight=70
     export function clearScreenTransition() {
         _state().clear()
@@ -176,10 +177,20 @@ namespace screenTransitions {
         _state().setZ(cutoffZ, renderZ);
     }
 
+    //% blockId=screen_transitions_set_sprite_z
+    //% block="set z of all $spriteKind sprites to $value"
+    //% spriteKind.shadow=spritekind
+    //% weight=50
+    export function setSpriteZ(spriteKind: number, value: number) {
+        for (const sprite of sprites.allOfKind(spriteKind)) {
+            sprite.z = value;
+        }
+    }
+
     //% blockId=screen_transitions_change_sprite_z
     //% block="change z of all $spriteKind sprites by $delta"
     //% spriteKind.shadow=spritekind
-    //% weight=50
+    //% weight=40
     export function changeSpriteZ(spriteKind: number, delta: number) {
         for (const sprite of sprites.allOfKind(spriteKind)) {
             sprite.z += delta;
