@@ -1,6 +1,6 @@
 {
     "name": "arcade-screen-transitions",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "An extension for doing screen transitions and wipes",
     "dependencies": {
         "device": "*",
