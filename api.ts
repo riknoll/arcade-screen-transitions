@@ -1,6 +1,6 @@
 
 //% color="#04c4d9"
-//% block="Screen Transitions"
+//% block="Transitions"
 namespace screenTransitions {
     //% fixedInstance
     //% whenUsed
