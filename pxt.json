@@ -1,0 +1,19 @@
+{
+    "name": "arcade-screen-transitions",
+    "version": "0.0.1",
+    "description": "An extension for doing screen transitions and wipes",
+    "dependencies": {
+        "device": "*",
+        "shader": "*",
+        "arcade-extension-utils": "github:riknoll/arcade-extension-utils#v0.0.1"
+    },
+    "files": [
+        "transitions.ts",
+        "api.ts",
+        "main.ts"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "preferredEditor": "tsprj"
+}
