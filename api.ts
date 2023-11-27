@@ -196,4 +196,11 @@ namespace screenTransitions {
             sprite.z += delta;
         }
     }
+
+    //% blockId=screen_transitions_swap_direction
+    //% block="set transition direction from upper to lower $upperToLower"
+    //% weight=30
+    export function setScreenTransitionDirection(upperToLower: boolean) {
+        _state().swapDirection = !upperToLower;
+    }
 }

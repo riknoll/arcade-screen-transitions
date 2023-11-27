@@ -7,6 +7,7 @@ namespace screenTransitions {
         swapRenderable: scene.Renderable;
         renderRenderable: scene.Renderable;
         isStatic: boolean;
+        swapDirection: boolean;
 
         // This is used by the start transition api
         transitionId: number;
@@ -28,6 +29,7 @@ namespace screenTransitions {
             })
 
             this.transitionId = 0;
+            this.swapDirection = false;
         }
 
         setZ(cutoffZ: number, renderZ: number) {
@@ -64,7 +66,13 @@ namespace screenTransitions {
 
         protected postRender() {
             if (this.transition) {
-                this.transition.draw(renderBackground);
+                if (this.swapDirection) {
+                    this.transition.draw(renderBackground, screen);
+                    screen.drawImage(renderBackground, 0, 0);
+                }
+                else {
+                    this.transition.draw(screen, renderBackground);
+                }
             }
         }
     }
@@ -111,16 +119,16 @@ namespace screenTransitions {
             this.progress = (this.percent / 100) * this.maxProgress
         }
 
-        draw(lowerScreen: Image) {
+        draw(upperScreen: Image, lowerScreen: Image) {
             if (this.percent === 100) {
-                screen.drawImage(lowerScreen, 0, 0)
+                upperScreen.drawImage(lowerScreen, 0, 0)
             }
             else {
-                this.drawCore(lowerScreen)
+                this.drawCore(upperScreen, lowerScreen)
             }
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
         }
     }
 
@@ -135,9 +143,9 @@ namespace screenTransitions {
             super.start(speed, reverse)
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             copyRect(
-                screen,
+                upperScreen,
                 lowerScreen,
                 this.copyX(),
                 this.copyY(),
@@ -210,7 +218,7 @@ namespace screenTransitions {
             this.maxProgress += 10
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             const angle = Math.PI / 60;
             const angle2 = Math.PI / 100;
 
@@ -220,7 +228,7 @@ namespace screenTransitions {
                 for (let x = 0; x < screen.width; x += 4) {
                     const offset = this.copyHeight() + Math.sin(angle * (x + o)) * 10 * Math.sin(angle2 * (x))
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         x,
                         0,
@@ -233,7 +241,7 @@ namespace screenTransitions {
                 for (let x = 0; x < screen.width; x += 4) {
                     const offset = this.copyHeight() + Math.sin(angle * (x + o)) * 10 * Math.sin(angle2 * (x))
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         x,
                         screen.height - offset,
@@ -252,7 +260,7 @@ namespace screenTransitions {
             this.maxProgress += 10
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             const angle = Math.PI / 60;
             const angle2 = Math.PI / 100;
 
@@ -262,7 +270,7 @@ namespace screenTransitions {
                 for (let y = 0; y < screen.height; y += 4) {
                     const offset = this.copyWidth() + Math.sin(angle * (y + o)) * 10 * Math.sin(angle2 * y)
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         0,
                         y,
@@ -275,7 +283,7 @@ namespace screenTransitions {
                 for (let y = 0; y < screen.height; y += 4) {
                     const offset = this.copyWidth() + Math.sin(angle * (y + o)) * 10 * Math.sin(angle2 * y)
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         screen.width - offset,
                         y,
@@ -293,7 +301,7 @@ namespace screenTransitions {
             super(screen.width << 1);
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             let kind = 0;
 
             if (this.bottomLeft) {
@@ -311,7 +319,7 @@ namespace screenTransitions {
             if (kind == 0) {
                 for (let y = 0; y < screen.height; y += 2) {
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         0,
                         y,
@@ -323,7 +331,7 @@ namespace screenTransitions {
             else if (kind == 1) {
                 for (let y = 0; y < screen.height; y += 2) {
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         screen.width - this.progress + y,
                         y,
@@ -335,7 +343,7 @@ namespace screenTransitions {
             else if (kind == 2) {
                 for (let y = 0; y < screen.height; y += 2) {
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         screen.width - this.progress + (screen.height - y),
                         y,
@@ -347,7 +355,7 @@ namespace screenTransitions {
             else if (kind == 3) {
                 for (let y = 0; y < screen.height; y += 2) {
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         0,
                         y,
@@ -366,21 +374,21 @@ namespace screenTransitions {
             this.maxProgress = Math.ceil(Math.sqrt(Math.pow(screen.width >> 1, 2) + Math.pow(screen.height >> 1, 2)))
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             initMask();
             mask.fill(0);
 
             if (this.reverse) {
                 mask.fillCircle(mask.width >> 1, mask.height >> 1, (this.maxProgress - this.progress) | 0, 1);
                 helpers.mapImage(
-                    screen,
+                    upperScreen,
                     mask,
                     0,
                     0,
                     maskShades
                 )
-                lowerScreen.drawTransparentImage(screen, 0, 0);
-                screen.drawImage(lowerScreen, 0, 0)
+                lowerScreen.drawTransparentImage(upperScreen, 0, 0);
+                upperScreen.drawImage(lowerScreen, 0, 0)
             }
             else {
                 mask.fillCircle(mask.width >> 1, mask.height >> 1, this.progress | 0, 1);
@@ -391,7 +399,7 @@ namespace screenTransitions {
                     0,
                     maskShades
                 )
-                screen.drawTransparentImage(lowerScreen, 0, 0);
+                upperScreen.drawTransparentImage(lowerScreen, 0, 0);
             }
         }
     }
@@ -403,7 +411,7 @@ namespace screenTransitions {
             this.maxProgress = screen.width + 2
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             initMask();
             mask.fill(0);
 
@@ -423,14 +431,14 @@ namespace screenTransitions {
                     false
                 )
                 helpers.mapImage(
-                    screen,
+                    upperScreen,
                     mask,
                     0,
                     0,
                     maskShades
                 )
-                lowerScreen.drawTransparentImage(screen, 0, 0);
-                screen.drawImage(lowerScreen, 0, 0)
+                lowerScreen.drawTransparentImage(upperScreen, 0, 0);
+                upperScreen.drawImage(lowerScreen, 0, 0)
             }
             else {
                 const width = (this.progress * 2) | 0;
@@ -454,7 +462,7 @@ namespace screenTransitions {
                     0,
                     maskShades
                 )
-                screen.drawTransparentImage(lowerScreen, 0, 0);
+                upperScreen.drawTransparentImage(lowerScreen, 0, 0);
             }
         }
     }
@@ -466,11 +474,11 @@ namespace screenTransitions {
             this.maxProgress = screen.width >> 3;
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             if (this.reverse) {
                 for (let x = 0; x < screen.width; x += this.maxProgress) {
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         x, 0,
                         this.progress,
@@ -481,7 +489,7 @@ namespace screenTransitions {
             else {
                 for (let x = 0; x < screen.width; x += this.maxProgress) {
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         x + this.maxProgress - this.progress, 0,
                         this.progress,
@@ -499,11 +507,11 @@ namespace screenTransitions {
             this.maxProgress = screen.height >> 3;
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             if (this.reverse) {
                 for (let y = 0; y < screen.height; y += this.maxProgress) {
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         0,
                         y,
@@ -515,7 +523,7 @@ namespace screenTransitions {
             else {
                 for (let y = 0; y < screen.height; y += this.maxProgress) {
                     copyRect(
-                        screen,
+                        upperScreen,
                         lowerScreen,
                         0,
                         y + this.maxProgress - this.progress,
@@ -541,7 +549,7 @@ namespace screenTransitions {
             super.start(speed, reverse);
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             initMask();
             this.random.reset();
             mask.fill(0);
@@ -561,7 +569,7 @@ namespace screenTransitions {
                 maskShades,
             );
 
-            screen.drawTransparentImage(lowerScreen, 0, 0)
+            upperScreen.drawTransparentImage(lowerScreen, 0, 0)
         }
     }
 
@@ -572,20 +580,20 @@ namespace screenTransitions {
             this.maxProgress = 360;
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             initMask();
             if (this.reverse) {
                 this.drawMask(this.maxProgress - this.progress)
 
                 helpers.mapImage(
-                    screen,
+                    upperScreen,
                     mask,
                     0,
                     0,
                     maskShades
                 )
-                lowerScreen.drawTransparentImage(screen, 0, 0);
-                screen.drawImage(lowerScreen, 0, 0)
+                lowerScreen.drawTransparentImage(upperScreen, 0, 0);
+                upperScreen.drawImage(lowerScreen, 0, 0)
             }
             else {
                 this.drawMask(this.progress);
@@ -597,7 +605,7 @@ namespace screenTransitions {
                     0,
                     maskShades
                 )
-                screen.drawTransparentImage(lowerScreen, 0, 0);
+                upperScreen.drawTransparentImage(lowerScreen, 0, 0);
             }
         }
 
@@ -688,10 +696,10 @@ namespace screenTransitions {
             this.maxProgress = screen.width >> 1;
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             if (this.reverse) {
                 copyRect(
-                    screen,
+                    upperScreen,
                     lowerScreen,
                     0,
                     0,
@@ -700,7 +708,7 @@ namespace screenTransitions {
                 )
 
                 copyRect(
-                    screen,
+                    upperScreen,
                     lowerScreen,
                     screen.width - this.progress,
                     0,
@@ -710,7 +718,7 @@ namespace screenTransitions {
             }
             else {
                 copyRect(
-                    screen,
+                    upperScreen,
                     lowerScreen,
                     (screen.width >> 1) - this.progress,
                     0,
@@ -728,10 +736,10 @@ namespace screenTransitions {
             this.maxProgress = screen.height >> 1;
         }
 
-        drawCore(lowerScreen: Image) {
+        drawCore(upperScreen: Image, lowerScreen: Image) {
             if (this.reverse) {
                 copyRect(
-                    screen,
+                    upperScreen,
                     lowerScreen,
                     0,
                     0,
@@ -740,7 +748,7 @@ namespace screenTransitions {
                 )
 
                 copyRect(
-                    screen,
+                    upperScreen,
                     lowerScreen,
                     0,
                     screen.height - this.progress,
@@ -750,7 +758,7 @@ namespace screenTransitions {
             }
             else {
                 copyRect(
-                    screen,
+                    upperScreen,
                     lowerScreen,
                     0,
                     (screen.height >> 1) - this.progress,
