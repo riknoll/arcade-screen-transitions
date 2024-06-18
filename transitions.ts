@@ -780,10 +780,10 @@ namespace screenTransitions {
     function initMask() {
         if (!mask) {
             mask = image.create(screen.width, screen.height);
-            maskShades = control.createBuffer(32);
+            maskShades = control.createBuffer(256);
 
             for (let i = 16; i < maskShades.length; i++) {
-                maskShades[i] = i - 16;
+                maskShades[i] = i % 16;
             }
         }
     }

@@ -127,9 +127,19 @@ namespace screenTransitions {
         return transition;
     }
 
+    //% blockId=screen_transitions_image_transition
+    //% block="image transition $mask"
+    //% mask.shadow=screen_image_picker
+    //% mask.fieldOptions.decompileIndirectFixedInstances=true
+    //% weight=0
+    export function imageTransition(mask: Image): Transition {
+        return new ImageTransition(mask);
+    }
+
     //% blockId=screen_transitions_start_transition
     //% block="start $transition transition for $time|ms reversed $reverse||and pause until done $pause"
     //% transition.shadow=screen_transitions_field_editor
+    //% transition.fieldOptions.decompileIndirectFixedInstances=true
     //% time.shadow=timePicker
     //% pause.defl=false
     //% weight=100
